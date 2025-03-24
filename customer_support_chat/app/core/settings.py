@@ -5,6 +5,7 @@ load_dotenv()
 
 class Config:
     OPENAI_API_KEY: str = environ.get("OPENAI_API_KEY", "")
+    GEMINI_API_KEY=environ.get("GEMINI_API_KEY")
     DATA_PATH: str = "./customer_support_chat/data"
     LOG_LEVEL: str = environ.get("LOG_LEVEL", "DEBUG")
     SQLITE_DB_PATH: str = environ.get(

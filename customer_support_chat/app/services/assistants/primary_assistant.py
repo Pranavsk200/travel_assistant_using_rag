@@ -66,7 +66,7 @@ primary_assistant_tools = [
 ]
 
 # Create the primary assistant runnable
-primary_assistant_runnable = primary_assistant_prompt | llm.bind_tools(primary_assistant_tools)
+primary_assistant_runnable = primary_assistant_prompt | llm.generate_content(primary_assistant_tools)
 
 # Instantiate the primary assistant
 primary_assistant = Assistant(primary_assistant_runnable)

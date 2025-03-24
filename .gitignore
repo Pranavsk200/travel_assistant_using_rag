@@ -165,3 +165,4 @@ qdrant_storage
 *.sqlite
 *.DS_Store
 *.bkp*
+.dev.env

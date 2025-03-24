@@ -2,21 +2,54 @@ from openai import OpenAI
 from vectorizer.app.core.settings import get_settings
 from typing import Union, List
 
+# settings = get_settings()
+# client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
+# def generate_embedding(content: Union[str, List[str]]) -> Union[List[float], List[List[float]]]:
+#     if isinstance(content, str):
+#         response = client.embeddings.create(
+#             model="text-embedding-ada-002",
+#             input=[content]
+#         )
+#         return response.data[0].embedding
+#     elif isinstance(content, list):
+#         response = client.embeddings.create(
+#             model="text-embedding-ada-002",
+#             input=content
+#         )
+#         return [item.embedding for item in response.data]
+#     else:
+#         raise ValueError("Content must be either a string or a list of strings")
+
+import google as genai
+from typing import Union, List
+
 settings = get_settings()
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
 
 def generate_embedding(content: Union[str, List[str]]) -> Union[List[float], List[List[float]]]:
+    model = "text-embedding-004"
+    client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    
     if isinstance(content, str):
-        response = client.embeddings.create(
-            model="text-embedding-ada-002",
-            input=[content]
+        response = client.models.embed_content(
+            model=model,
+            contents=content,
+            task_type="retrieval_document"
         )
-        return response.data[0].embedding
+        return response.embeddings
+
     elif isinstance(content, list):
-        response = client.embeddings.create(
-            model="text-embedding-ada-002",
-            input=content
-        )
-        return [item.embedding for item in response.data]
+        return [
+            client.models.embed_content(
+                model=model,
+                contents=text,
+                task_type="retrieval_document"
+            ).embeddings
+            for text in content
+        ]
+
     else:
         raise ValueError("Content must be either a string or a list of strings")
+
+

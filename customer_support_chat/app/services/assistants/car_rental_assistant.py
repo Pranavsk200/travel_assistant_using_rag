@@ -33,13 +33,15 @@ car_rental_prompt = ChatPromptTemplate.from_messages(
     ]
 ).partial(time=datetime.now())
 
+
+
 # Car rental tools
 book_car_rental_safe_tools = [search_car_rentals]
 book_car_rental_sensitive_tools = [book_car_rental, update_car_rental, cancel_car_rental]
 book_car_rental_tools = book_car_rental_safe_tools + book_car_rental_sensitive_tools
 
 # Create the car rental assistant runnable
-book_car_rental_runnable = car_rental_prompt | llm.bind_tools(
+book_car_rental_runnable = car_rental_prompt | llm.generate_content(
     book_car_rental_tools + [CompleteOrEscalate]
 )
 

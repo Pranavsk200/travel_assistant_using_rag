@@ -15,6 +15,9 @@ import aiohttp
 from tqdm.asyncio import tqdm_asyncio
 from more_itertools import chunked
 import time
+from google import genai
+import asyncio
+from typing import Union
 
 settings = get_settings()
 
@@ -27,8 +30,12 @@ class VectorDB:
             self.create_or_clear_collection()
 
     def connect_to_qdrant(self):
-        self.client = QdrantClient(url=settings.QDRANT_URL)
-        logger.info("Connected to Qdrant")
+        try:
+            self.client = QdrantClient(url=settings.QDRANT_URL)
+            print('Connected to Qdrant')
+            logger.info("Connected to Qdrant")
+        except:
+            print("Error while connecting")
 
     def create_or_clear_collection(self):
         if self.client.collection_exists(self.collection_name):
@@ -73,21 +80,33 @@ class VectorDB:
         else:
             return str(data)
 
-    async def generate_embedding_async(self, content, session):
-        max_retries = 5
+    async def generate_embedding_async(self, content: Union[str, list], session):
+        client = genai.Client(api_key="AIzaSyBJj2tNQ3JF9Opet6YKMk0EgGBfkXe38E0")
+        model = "text-embedding-004"
+        max_retries = 1
         base_delay = 1
+
         for attempt in range(max_retries):
             try:
-                async with session.post(
-                    "https://api.openai.com/v1/embeddings",
-                    headers={"Authorization": f"Bearer {settings.OPENAI_API_KEY}"},
-                    json={"model": "text-embedding-ada-002", "input": content}
-                ) as response:
-                    result = await response.json()
-                    if "data" in result and len(result["data"]) > 0:
-                        return result["data"][0]["embedding"]
-                    else:
-                        raise ValueError(f"Unexpected API response: {result}")
+                if isinstance(content, str):
+                    response = client.models.embed_content(
+                        model=model,
+                        contents=content,
+                    )
+                    return response.embeddings[0].values  # Return the values list
+
+                elif isinstance(content, list):
+                    embeddings = []
+                    for text in content:
+                        response = client.models.embed_content(
+                            model=model,
+                            contents=text,
+                        )
+                        embeddings.append(response.embeddings[0].values) # append the values list
+                    return embeddings
+                else:
+                    raise ValueError("Content must be a string or a list of strings")
+
             except Exception as e:
                 if attempt == max_retries - 1:
                     logger.error(f"Failed to generate embedding after {max_retries} attempts: {str(e)}")
@@ -98,9 +117,11 @@ class VectorDB:
 
     async def process_chunk(self, chunk, metadata, session):
         embedding = await self.generate_embedding_async(chunk, session)
+        # print(chunk)
+
         return PointStruct(
             id=str(uuid.uuid4()),
-            vector=embedding,
+            vector=embedding,  # Now embedding should be a flat list of floats
             payload={
                 "content": chunk,
                 **metadata
@@ -200,5 +221,5 @@ class VectorDB:
         return search_result
 
 if __name__ == "__main__":
-    vectordb = VectorDB("example_table", "example_collection")
+    vectordb = VectorDB("faq", "faq_collection")
     vectordb.create_embeddings()
