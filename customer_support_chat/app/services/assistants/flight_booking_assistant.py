@@ -32,10 +32,10 @@ update_flight_safe_tools = [search_flights]
 update_flight_sensitive_tools = [update_ticket_to_new_flight, cancel_ticket]
 update_flight_tools = update_flight_safe_tools + update_flight_sensitive_tools
 
+# print("update_flight_tools\n", update_flight_tools)
 # Create the flight booking assistant runnable
 update_flight_runnable = flight_booking_prompt | llm.bind_tools(
     update_flight_tools + [CompleteOrEscalate]
 )
-
 # Instantiate the flight booking assistant
 flight_booking_assistant = Assistant(update_flight_runnable)

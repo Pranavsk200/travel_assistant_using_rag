@@ -39,3 +39,7 @@ def lookup_policy(query: str) -> str:
     
     policy_info = "\n\n".join([f"Q: {entry['question']}\nA: {entry['answer']}" for entry in faq_results])
     return f"Here's the relevant policy information:\n\n{policy_info}"
+
+def lookup_policy_wrapper(query: str) -> List[Dict]:
+    """Wrapper for LangChain's `search_flights` tool to make it Gemini-compatible."""
+    return lookup_policy(query=query)

@@ -6,6 +6,8 @@ from customer_support_chat.app.graph import multi_agentic_graph
 from customer_support_chat.app.services.utils import download_and_prepare_db
 from customer_support_chat.app.core.logger import logger
 from langchain_core.messages import ToolMessage, HumanMessage, AIMessage
+import warnings
+warnings.filterwarnings('ignore')
 
 def main():
     # Ensure the database is downloaded and prepared

@@ -20,8 +20,7 @@ from typing import Union, List
 #         return [item.embedding for item in response.data]
 #     else:
 #         raise ValueError("Content must be either a string or a list of strings")
-
-import google as genai
+from google import genai
 from typing import Union, List
 
 settings = get_settings()
@@ -35,19 +34,18 @@ def generate_embedding(content: Union[str, List[str]]) -> Union[List[float], Lis
         response = client.models.embed_content(
             model=model,
             contents=content,
-            task_type="retrieval_document"
         )
-        return response.embeddings
+        return response.embeddings[0].values
 
     elif isinstance(content, list):
-        return [
-            client.models.embed_content(
+        embeddings = []
+        for text in content:
+            response = client.models.embed_content(
                 model=model,
                 contents=text,
-                task_type="retrieval_document"
-            ).embeddings
-            for text in content
-        ]
+            )
+            embeddings.append(response.embeddings[0].values) # append the values list
+        return embeddings
 
     else:
         raise ValueError("Content must be either a string or a list of strings")

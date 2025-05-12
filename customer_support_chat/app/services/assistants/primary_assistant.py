@@ -4,10 +4,14 @@ from customer_support_chat.app.services.tools import (
     search_flights,
     lookup_policy,
 )
+from customer_support_chat.app.services.tools.flights import search_flights_wrapper
+from customer_support_chat.app.services.tools.lookup import lookup_policy_wrapper
 from langchain_community.tools.ddg_search.tool import DuckDuckGoSearchResults
 from customer_support_chat.app.services.assistants.assistant_base import Assistant, llm
 from customer_support_chat.app.core.state import State
 from pydantic import BaseModel, Field
+from google.genai import types
+from typing import Union
 
 # Define task delegation tools
 class ToFlightBookingAssistant(BaseModel):
@@ -66,7 +70,20 @@ primary_assistant_tools = [
 ]
 
 # Create the primary assistant runnable
-primary_assistant_runnable = primary_assistant_prompt | llm.generate_content(primary_assistant_tools)
+primary_assistant_runnable = primary_assistant_prompt | llm.bind_tools(primary_assistant_tools)
+# primary_assistant_runnable = llm.generate_content(
+#     model='gemini-2.0-flash',
+#     contents=primary_assistant_prompt,
+#     config=types.GenerateContentConfig(
+#         tools=[search_flights_wrapper, lookup_policy_wrapper],
+#         response_schema=Union[
+#             ToFlightBookingAssistant, 
+#             ToBookCarRental,
+#             ToHotelBookingAssistant,
+#             ToBookExcursion
+#         ], 
+#     ),
+# )
 
 # Instantiate the primary assistant
 primary_assistant = Assistant(primary_assistant_runnable)

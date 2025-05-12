@@ -49,25 +49,55 @@ def book_hotel(hotel_id: int) -> str:
         conn.close()
         return f"No hotel found with ID {hotel_id}."
 
+# @tool
+# def update_hotel(
+#     hotel_id: int,
+#     checkin_date: Optional[Union[datetime, date]] = None,
+#     checkout_date: Optional[Union[datetime, date]] = None,
+# ) -> str:
+#     """Update a hotel's check-in and check-out dates by its ID."""
+#     conn = sqlite3.connect(db)
+#     cursor = conn.cursor()
+
+#     if checkin_date:
+#         cursor.execute(
+#             "UPDATE hotels SET checkin_date = ? WHERE id = ?",
+#             (checkin_date.strftime('%Y-%m-%d'), hotel_id),
+#         )
+#     if checkout_date:
+#         cursor.execute(
+#             "UPDATE hotels SET checkout_date = ? WHERE id = ?",
+#             (checkout_date.strftime('%Y-%m-%d'), hotel_id),
+#         )
+
+#     conn.commit()
+
+#     if cursor.rowcount > 0:
+#         conn.close()
+#         return f"Hotel {hotel_id} successfully updated."
+#     else:
+#         conn.close()
+#         return f"No hotel found with ID {hotel_id}."
+
 @tool
 def update_hotel(
     hotel_id: int,
-    checkin_date: Optional[Union[datetime, date]] = None,
-    checkout_date: Optional[Union[datetime, date]] = None,
+    checkin_date: Optional[str] = None,
+    checkout_date: Optional[str] = None,
 ) -> str:
-    """Update a hotel's check-in and check-out dates by its ID."""
+    """Update a hotel's check-in and check-out dates by its ID. Dates should be in 'YYYY-MM-DD' format."""
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
     if checkin_date:
         cursor.execute(
             "UPDATE hotels SET checkin_date = ? WHERE id = ?",
-            (checkin_date.strftime('%Y-%m-%d'), hotel_id),
+            (checkin_date, hotel_id),
         )
     if checkout_date:
         cursor.execute(
             "UPDATE hotels SET checkout_date = ? WHERE id = ?",
-            (checkout_date.strftime('%Y-%m-%d'), hotel_id),
+            (checkout_date, hotel_id),
         )
 
     conn.commit()
@@ -78,6 +108,7 @@ def update_hotel(
     else:
         conn.close()
         return f"No hotel found with ID {hotel_id}."
+
 
 @tool
 def cancel_hotel(hotel_id: int) -> str:

@@ -37,7 +37,7 @@ hotel_booking_prompt = ChatPromptTemplate.from_messages(
 book_hotel_safe_tools = [search_hotels]
 book_hotel_sensitive_tools = [book_hotel, update_hotel, cancel_hotel]
 book_hotel_tools = book_hotel_safe_tools + book_hotel_sensitive_tools
-
+# print("this is book_hotel_tools\n",book_hotel_tools)
 # Create the hotel booking assistant runnable
 book_hotel_runnable = hotel_booking_prompt | llm.bind_tools(
     book_hotel_tools + [CompleteOrEscalate]

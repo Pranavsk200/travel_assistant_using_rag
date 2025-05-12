@@ -81,7 +81,7 @@ class VectorDB:
             return str(data)
 
     async def generate_embedding_async(self, content: Union[str, list], session):
-        client = genai.Client(api_key="AIzaSyBJj2tNQ3JF9Opet6YKMk0EgGBfkXe38E0")
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
         model = "text-embedding-004"
         max_retries = 1
         base_delay = 1

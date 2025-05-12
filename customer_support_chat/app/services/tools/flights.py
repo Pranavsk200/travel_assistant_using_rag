@@ -6,6 +6,7 @@ import sqlite3
 from typing import Optional, Union, List, Dict
 from datetime import datetime, date
 import pytz
+from google.genai.types import Tool
 
 settings = get_settings()
 db = settings.SQLITE_DB_PATH
@@ -72,6 +73,10 @@ def search_flights(
             "similarity": result.score,
         })
     return flights
+
+def search_flights_wrapper(query: str, limit: int = 2) -> List[Dict]:
+    """Wrapper for LangChain's `search_flights` tool to make it Gemini-compatible."""
+    return search_flights(query=query, limit=limit)
 
 @tool
 def update_ticket_to_new_flight(

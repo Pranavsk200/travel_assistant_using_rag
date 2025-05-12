@@ -4,13 +4,16 @@ from customer_support_chat.app.core.state import State
 from pydantic import BaseModel
 from customer_support_chat.app.core.settings import get_settings
 from langchain_openai import ChatOpenAI
-from google.generativeai import GenerativeModel
-import google.generativeai as genai
+from langchain_google_genai import chat_models
+from langchain_google_genai.chat_models import ChatGoogleGenerativeAI
+from google.genai import types
+from google import genai
 settings = get_settings()
 
-genai.configure(api_key=settings.GEMINI_API_KEY)
-
-llm = GenerativeModel(model_name="gemini-2.0-flash")
+# llm = GenerativeModel(model_name="gemini-2.0-flash")
+client = genai.Client(api_key="AIzaSyBJj2tNQ3JF9Opet6YKMk0EgGBfkXe38E0")
+# llm = client.models
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=settings.GEMINI_API_KEY)
 # Initialize the language model (shared among assistants)
 # llm = ChatOpenAI(
 #     model="gpt-4",

@@ -50,25 +50,64 @@ def book_car_rental(rental_id: int) -> str:
         conn.close()
         return f"No car rental found with ID {rental_id}."
 
+# @tool
+# def update_car_rental(
+#     rental_id: int,
+#     start_date: Optional[Union[datetime, date]] = None,
+#     end_date: Optional[Union[datetime, date]] = None,
+# ) -> str:
+#     """Update a car rental's start and end dates by its ID."""
+#     conn = sqlite3.connect(db)
+#     cursor = conn.cursor()
+
+#     if start_date:
+#         cursor.execute(
+#             "UPDATE car_rentals SET start_date = ? WHERE id = ?",
+#             (start_date.strftime('%Y-%m-%d'), rental_id),
+#         )
+#     if end_date:
+#         cursor.execute(
+#             "UPDATE car_rentals SET end_date = ? WHERE id = ?",
+#             (end_date.strftime('%Y-%m-%d'), rental_id),
+#         )
+
+#     conn.commit()
+
+#     if cursor.rowcount > 0:
+#         conn.close()
+#         return f"Car rental {rental_id} successfully updated."
+#     else:
+#         conn.close()
+#         return f"No car rental found with ID {rental_id}."
+    
 @tool
 def update_car_rental(
     rental_id: int,
-    start_date: Optional[Union[datetime, date]] = None,
-    end_date: Optional[Union[datetime, date]] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
 ) -> str:
-    """Update a car rental's start and end dates by its ID."""
+    """Update a car rental's start and end dates by its ID. Dates should be in 'YYYY-MM-DD' format."""
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
+    def validate_and_format(date_str: str) -> str:
+        try:
+            return datetime.strptime(date_str, "%Y-%m-%d").strftime('%Y-%m-%d')
+        except ValueError:
+            raise ValueError(f"Invalid date format: {date_str}. Use 'YYYY-MM-DD'.")
+
     if start_date:
+        start_date = validate_and_format(start_date)
         cursor.execute(
             "UPDATE car_rentals SET start_date = ? WHERE id = ?",
-            (start_date.strftime('%Y-%m-%d'), rental_id),
+            (start_date, rental_id),
         )
+
     if end_date:
+        end_date = validate_and_format(end_date)
         cursor.execute(
             "UPDATE car_rentals SET end_date = ? WHERE id = ?",
-            (end_date.strftime('%Y-%m-%d'), rental_id),
+            (end_date, rental_id),
         )
 
     conn.commit()
